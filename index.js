@@ -25,7 +25,7 @@ exports.handleHttpRequest = function(request, context, done) {
         var params = {
           TableName: questionnaireTableName,
           Key: { 'email' : { S: email } },
-          ProjectionExpression: 'email,firstname,surname,address,mobile,availableFrequency,dayPreferences,currentQualifications,spokenLanguages,skillsToShare,typesToExclude'
+          ProjectionExpression: 'email,firstName,lastName,phoneNumber,wouldVolunteer,volunteerPeriods,chosenQualificationsAndClearances,languages,otherLanguages,skills,otherSkills,restrictions'
         };
         // Call DynamoDB to read the item from the table
         dynamo.getItem(params, function(err, data) {
@@ -53,16 +53,17 @@ exports.handleHttpRequest = function(request, context, done) {
         let dynamo = new AWS.DynamoDB();
         let item = {}
         addDynamoStringIfNotEmpty(item, 'email', email);
-        addDynamoStringIfNotEmpty(item, 'firstname', bodyJSON['firstname']);
-        addDynamoStringIfNotEmpty(item, 'surname', bodyJSON['surname']);
-        addDynamoStringIfNotEmpty(item, 'address', bodyJSON['address']);
-        addDynamoStringIfNotEmpty(item, 'mobile', bodyJSON['mobile']);
-        addDynamoStringIfNotEmpty(item, 'availableFrequency', bodyJSON['availableFrequency']);
-        addDynamoStringIfNotEmpty(item, 'dayPreferences', bodyJSON['dayPreferences']);
-        addDynamoStringIfNotEmpty(item, 'currentQualifications', bodyJSON['currentQualifications']);
-        addDynamoStringIfNotEmpty(item, 'spokenLanguages', bodyJSON['spokenLanguages']);
-        addDynamoStringIfNotEmpty(item, 'skillsToShare', bodyJSON['skillsToShare']);
-        addDynamoStringIfNotEmpty(item, 'typesToExclude', bodyJSON['typesToExclude']);
+        addDynamoStringIfNotEmpty(item, 'firstname', bodyJSON['firstName']);
+        addDynamoStringIfNotEmpty(item, 'lastName', bodyJSON['lastName']);
+        addDynamoStringIfNotEmpty(item, 'phoneNumber', bodyJSON['phoneNumber']);
+        addDynamoStringIfNotEmpty(item, 'wouldVolunteer', bodyJSON['wouldVolunteer']);
+        addDynamoStringIfNotEmpty(item, 'volunteerPeriods', bodyJSON['volunteerPeriods']);
+        addDynamoStringIfNotEmpty(item, 'chosenQualificationsAndClearances', bodyJSON['chosenQualificationsAndClearances']);
+        addDynamoStringIfNotEmpty(item, 'languages', bodyJSON['languages']);
+        addDynamoStringIfNotEmpty(item, 'otherLanguages', bodyJSON['otherLanguages']);
+        addDynamoStringIfNotEmpty(item, 'skills', bodyJSON['skills']);
+        addDynamoStringIfNotEmpty(item, 'otherSkills', bodyJSON['otherSkills']);
+        addDynamoStringIfNotEmpty(item, 'restrictions', bodyJSON['restrictions']);
         let params = {
           TableName: questionnaireTableName,
           Item: item
@@ -95,16 +96,17 @@ function handleEmptyAttributes(data) {
   let item = data.Item;
   let valuesMap = {};
   addIfNotEmpty(valuesMap, 'email', item.email);
-  addIfNotEmpty(valuesMap, 'firstname', item.firstname);
-  addIfNotEmpty(valuesMap, 'surname', item.surname);
-  addIfNotEmpty(valuesMap, 'address', item.address);
-  addIfNotEmpty(valuesMap, 'mobile', item.mobile);
-  addIfNotEmpty(valuesMap, 'availableFrequency', item.availableFrequency);
-  addIfNotEmpty(valuesMap, 'dayPreferences', item.dayPreferences);
-  addIfNotEmpty(valuesMap, 'currentQualifications', item.currentQualifications);
-  addIfNotEmpty(valuesMap, 'spokenLanguages', item.spokenLanguages);
-  addIfNotEmpty(valuesMap, 'skillsToShare', item.skillsToShare);
-  addIfNotEmpty(valuesMap, 'typesToExclude', item.typesToExclude);
+  addIfNotEmpty(valuesMap, 'firstName', item.firstName);
+  addIfNotEmpty(valuesMap, 'lastName', item.lastName);
+  addIfNotEmpty(valuesMap, 'phoneNumber', item.phoneNumber);
+  addIfNotEmpty(valuesMap, 'wouldVolunteer', item.wouldVolunteer);
+  addIfNotEmpty(valuesMap, 'volunteerPeriods', item.volunteerPeriods);
+  addIfNotEmpty(valuesMap, 'chosenQualificationsAndClearances', item.chosenQualificationsAndClearances);
+  addIfNotEmpty(valuesMap, 'languages', item.languages);
+  addIfNotEmpty(valuesMap, 'otherLanguages', item.otherLanguages);
+  addIfNotEmpty(valuesMap, 'skills', item.skills);
+  addIfNotEmpty(valuesMap, 'otherSkills', item.otherSkills);
+  addIfNotEmpty(valuesMap, 'restrictions', item.restrictions);
 
   return valuesMap;
 }

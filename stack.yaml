@@ -100,23 +100,25 @@ Resources:
                         type: string
                       firstName:
                         type: string
-                      surname:
+                      lastName:
                         type: string
-                      address:
+                      phoneNumber:
                         type: string
-                      mobile:
+                      wouldVolunteer:
                         type: string
-                      availableFrequency:
+                      volunteerPeriods:
                         type: string
-                      dayPreferences:
+                      chosenQualificationsAndClearances:
                         type: string
-                      currentQualifications:
+                      languages:
                         type: string
-                      spokenLanguages:
+                      otherLanguages:
                         type: string
-                      skillsToShare:
+                      skills:
                         type: string
-                      typesToExclude:
+                      otherSkills:
+                        type: string
+                      restrictions:
                         type: string
 
   MyApiGatewayDeployment:

@@ -57,13 +57,13 @@ exports.handleHttpRequest = function(request, context, done) {
         addDynamoStringIfNotEmpty(item, 'lastName', bodyJSON['lastName']);
         addDynamoStringIfNotEmpty(item, 'phoneNumber', bodyJSON['phoneNumber']);
         addDynamoStringIfNotEmpty(item, 'wouldVolunteer', bodyJSON['wouldVolunteer']);
-        addDynamoStringIfNotEmpty(item, 'volunteerPeriods', bodyJSON['volunteerPeriods']);
-        addDynamoStringIfNotEmpty(item, 'chosenQualificationsAndClearances', bodyJSON['chosenQualificationsAndClearances']);
-        addDynamoStringIfNotEmpty(item, 'languages', bodyJSON['languages']);
-        addDynamoStringIfNotEmpty(item, 'otherLanguages', bodyJSON['otherLanguages']);
-        addDynamoStringIfNotEmpty(item, 'skills', bodyJSON['skills']);
-        addDynamoStringIfNotEmpty(item, 'otherSkills', bodyJSON['otherSkills']);
-        addDynamoStringIfNotEmpty(item, 'restrictions', bodyJSON['restrictions']);
+        addDynamoStringIfNotEmpty(item, 'volunteerPeriods', JSON.stringify(bodyJSON['volunteerPeriods']));
+        addDynamoStringIfNotEmpty(item, 'chosenQualificationsAndClearances', (bodyJSON['chosenQualificationsAndClearances'] || []).join('|'));
+        addDynamoStringIfNotEmpty(item, 'languages', (bodyJSON['languages'] || []).join('|'));
+        addDynamoStringIfNotEmpty(item, 'otherLanguages', (bodyJSON['otherLanguages'] || []).join('|'));
+        addDynamoStringIfNotEmpty(item, 'skills', (bodyJSON['skills'] || []).join('|'));
+        addDynamoStringIfNotEmpty(item, 'otherSkills', (bodyJSON['otherSkills'] || []).join('|'));
+        addDynamoStringIfNotEmpty(item, 'restrictions', (bodyJSON['restrictions'] || []).join('|'));
         let params = {
           TableName: questionnaireTableName,
           Item: item

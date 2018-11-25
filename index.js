@@ -33,6 +33,7 @@ exports.handleHttpRequest = function(request, context, done) {
         let bodyJSON = JSON.parse(request.body || '{}');
         let dynamo = new AWS.DynamoDB();
         let item = {}
+        let email = request.pathParameters.email;
         addDynamoStringIfNotEmpty(item, 'email', email);
         addDynamoStringIfNotEmpty(item, 'firstname', bodyJSON['firstName']);
         addDynamoStringIfNotEmpty(item, 'lastName', bodyJSON['lastName']);
@@ -51,7 +52,9 @@ exports.handleHttpRequest = function(request, context, done) {
         };
         dynamo.putItem(params, function(error, data) {
           if (error) throw `Dynamo Error (${error})`;
-          else done(null, response);
+          else {
+            done(null, response);
+          }
         })
         break;
       }
@@ -60,6 +63,7 @@ exports.handleHttpRequest = function(request, context, done) {
     done(e, null);
   }
 }
+
 
 function getAllUsers(response, done) {
   console.log('GET');

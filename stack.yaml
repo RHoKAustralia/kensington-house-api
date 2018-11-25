@@ -56,6 +56,22 @@ Resources:
         produces:
           - application/json
         paths:
+          /users:
+            get:
+              description: Get all users
+              x-amazon-apigateway-integration:
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${UsersLambda.Arn}/invocations"
+                credentials: !GetAtt MyApiGatewayRole.Arn
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+              operationId: getAllUsers
+              parameters:
+                - name: email
+                  in: path
+                  description: TBD
+                  required: true
+                  type: string
           /users/{email}/questionnaire:
             get:
               description: Get all questionnaire responses for a given email address
@@ -174,6 +190,14 @@ Resources:
       ManagedPolicyArns:
         - !Ref BaseLambdaExecutionPolicy
       Policies:
+        - PolicyName: getAllUsers
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Scan
+                Resource: !Sub "arn:aws:dynamodb:${AWS::Region}:*:table/${QuestionnaireTable}"
         - PolicyName: getUsers
           PolicyDocument:
             Version: '2012-10-17'

@@ -11,7 +11,6 @@ const questionnaireTableName = questionnaireDBArnArr[questionnaireDBArnArr.lengt
 // handleHttpRequest is the entry point for Lambda requests
 exports.handleHttpRequest = function(request, context, done) {
   try {
-    const email = request.pathParameters.email;
     let response = {
       headers: {},
       body: '',
@@ -20,30 +19,12 @@ exports.handleHttpRequest = function(request, context, done) {
 
     switch (request.httpMethod) {
       case 'GET': {
-        console.log('GET');
-        let dynamo = new AWS.DynamoDB();
-        var params = {
-          TableName: questionnaireTableName,
-          Key: { 'email' : { S: email } },
-          ProjectionExpression: 'email,firstName,lastName,phoneNumber,wouldVolunteer,volunteerPeriods,chosenQualificationsAndClearances,languages,otherLanguages,skills,otherSkills,restrictions'
-        };
-        // Call DynamoDB to read the item from the table
-        dynamo.getItem(params, function(err, data) {
-          if (err) {
-            console.log("Error", err);
-            throw `Dynamo Get Error (${err})`
-          } else {
-            if (!data.Item) {
-              response['statusCode'] = 404
-              response['body'] = 'Email address not found'
-            } else {
-              console.log("Success", data.Item.email);
-              response.body = JSON.stringify(
-                handleEmptyAttributes(data));
-            }
-            done(null, response);
-          }
-        });
+
+        if (request.pathParameters) {
+          getSingleUser(request.pathParameters.email, response, done);
+        } else {
+          getAllUsers(response, done);
+        }
         break;
       }
 
@@ -80,6 +61,65 @@ exports.handleHttpRequest = function(request, context, done) {
   }
 }
 
+function getAllUsers(response, done) {
+  console.log('GET');
+  let dynamo = new AWS.DynamoDB();
+  var params = {
+    TableName: questionnaireTableName,
+    ProjectionExpression: 'email,firstName,lastName,phoneNumber,wouldVolunteer,volunteerPeriods,chosenQualificationsAndClearances,languages,otherLanguages,skills,otherSkills,restrictions'
+  };
+  // Call DynamoDB to read the item from the table
+  dynamo.scan(params, function (err, data) {
+    if (err) {
+      console.log("Error", err);
+      throw `Dynamo Get Error (${err})`;
+    }
+    else {
+      if (!data.Items) {
+        response['statusCode'] = 404;
+        response['body'] = 'No records found';
+      }
+      else {
+        var itemArray = [];
+        for (let item of data.Items) {
+          console.log(item);
+          itemArray.push(handleEmptyAttributes(item));
+        }
+        response.body = JSON.stringify(itemArray);
+      }
+      done(null, response);
+    }
+  });
+}
+
+function getSingleUser(email, response, done) {
+  console.log('GET');
+  let dynamo = new AWS.DynamoDB();
+  var params = {
+    TableName: questionnaireTableName,
+    Key: { 'email': { S: email } },
+    ProjectionExpression: 'email,firstName,lastName,phoneNumber,wouldVolunteer,volunteerPeriods,chosenQualificationsAndClearances,languages,otherLanguages,skills,otherSkills,restrictions'
+  };
+  // Call DynamoDB to read the item from the table
+  dynamo.getItem(params, function (err, data) {
+    if (err) {
+      console.log("Error", err);
+      throw `Dynamo Get Error (${err})`;
+    }
+    else {
+      if (!data.Item) {
+        response['statusCode'] = 404;
+        response['body'] = 'Email address not found';
+      }
+      else {
+        console.log("Success", data.Item.email);
+        response.body = JSON.stringify(handleEmptyAttributes(data.Item));
+      }
+      done(null, response);
+    }
+  });
+}
+
 function addDynamoStringIfNotEmpty(valuesMap, attributeKey, attributeValue) {
   if (attributeValue) {
     valuesMap[attributeKey] = { S: attributeValue };
@@ -92,8 +132,7 @@ function addIfNotEmpty(valuesMap, attributeKey, attributeValue) {
   }
 }
 
-function handleEmptyAttributes(data) {
-  let item = data.Item;
+function handleEmptyAttributes(item) {
   let valuesMap = {};
   addIfNotEmpty(valuesMap, 'email', item.email);
   addIfNotEmpty(valuesMap, 'firstName', item.firstName);
